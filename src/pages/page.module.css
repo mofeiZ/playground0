@@ -1,0 +1,46 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: space-between; */
+  /* align-items: center; */
+  height: 100vh;
+  width: 100vw;
+  /* min-height: 100vh; */
+}
+
+.description {
+  display: inherit;
+  justify-content: inherit;
+  align-items: inherit;
+  font-size: 0.85rem;
+  max-width: var(--max-width);
+  width: 100%;
+  z-index: 2;
+  font-family: var(--font-mono);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  border-bottom: 2px darkgray;
+  height: 50px;
+  gap: 0.5rem;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  align-items: left;
+  gap: 0.5rem;
+}
+
+.editorinput {
+  /* height: 500px */
+}
+
+.editorarea {
+  display: flex;
+  flex-direction: row;
+}
