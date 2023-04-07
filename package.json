@@ -1,0 +1,31 @@
+{
+  "name": "playground0",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prettier": "prettier --write ."
+  },
+  "dependencies": {
+    "@types/node": "^18.15.9",
+    "@types/react": "^18.0.29",
+    "@types/react-dom": "18.0.11",
+    "eslint": "8.36.0",
+    "eslint-config-next": "13.2.4",
+    "invariant": "^2.2.4",
+    "lodash": "^4.17.21",
+    "next": "13.2.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "^5.0.2",
+    "wasm-api": "link:./deps/wasm-api"
+  },
+  "devDependencies": {
+    "@types/invariant": "^2.2.35",
+    "@types/lodash": "^4.14.191",
+    "prettier": "^2.8.7"
+  }
+}
