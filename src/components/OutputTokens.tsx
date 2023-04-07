@@ -3,6 +3,9 @@ import styles from '../pages/page.module.css';
 import type { WasmParserContext } from 'wasm-api';
 import invariant from 'invariant';
 
+// TODO: highlighting for unicode is off, since Rust source is currently
+// returning byte offsets (not char offsets)
+
 export default function TokenTab({
   wasmContext,
   source,
@@ -18,14 +21,14 @@ export default function TokenTab({
   invariant(errors.length % 3 === 0, 'Bad length errors', errors);
 
   const highlights: Array<[number, number, string, string]> = [];
-
   for (let i = 0; i < tokens.length; i += 3) {
-    highlights.push(
-      [tokens[i + 1], tokens[i + 2], styles.token, tokenLookup[tokens[i]]] ??
-        '<internal error>'
+    const description = tokenLookup[tokens[i]];
+    invariant(
+      description != null,
+      'Internal error, wasm string table inconsistent'
     );
+    highlights.push([tokens[i + 1], tokens[i + 2], styles.token, description]);
   }
-
   for (let i = 0; i < errors.length; i += 3) {
     highlights.push([errors[i + 1], errors[i + 2], styles.tokenbad, '<error>']);
   }
@@ -43,6 +46,7 @@ type HighlightedTextAreaProps = {
   // start, end, css-class, on-hover
   highlights: Array<[number, number, string, string]>;
 };
+
 // We *might* want to use a canvas at some point, but let's do what's easy for now!
 // (What are the limits of DOM perf anyway, surely it can handle 100000s of text nodes 🧐)
 // https://github.com/evanw/source-map-visualization looks p cool
@@ -51,12 +55,17 @@ function HighlightedTextArea({ source, highlights }: HighlightedTextAreaProps) {
 
   let lastHighlight = 0;
 
-  for (const [start, end, cssClass] of highlights) {
+  for (const [start, end, cssClass, description] of highlights) {
     if (start !== lastHighlight) {
       invariant(start > lastHighlight, 'bad start!');
       snippets.push(source.slice(lastHighlight, start));
     }
-    snippets.push(<mark className={cssClass}>{source.slice(start, end)}</mark>);
+    snippets.push(
+      <mark className={cssClass + ' ' + styles.tooltip}>
+        {source.slice(start, end)}
+        <span className={styles.tooltiptext}>{description}</span>
+      </mark>
+    );
     lastHighlight = end;
   }
 

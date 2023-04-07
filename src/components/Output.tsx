@@ -57,28 +57,31 @@ const Output = dynamic(() => {
           wasmContext !== compilerResult.value
         ) {
           if (wasmContext) {
+            // todo: we should return this as cleanup function
             wasmContext.free();
           }
-          // Is this an antipattern? setState during render will always trigger a second
+          // This should be an effect, right? setState during render will always trigger a second
           // render 🧐 (which should be a no-op)
-          // Also, the entire purpose of this useMemo would be for its side effects
-          // (i.e. freeing wasm memory + setting React state)
+          // Also, the entire purpose of this state is for its side effects, since useCompiler
+          // already takes care of memoizing source -> result computation.
+          // TODO remove wasmContext state
           setWasmContext(compilerResult.value);
         }
         // No-op if compilerResult.kind === 'Context' && wasmContext === compilerResult.value
         // (next render after set)
       }, [compilerResult, wasmContext]);
 
-      let w = compilerResult.kind === 'Context' ? compilerResult.value : null;
-      let e =
+      let context =
+        compilerResult.kind === 'Context' ? compilerResult.value : null;
+      let error =
         compilerResult.kind === 'UnexpectedError' ? compilerResult.value : null;
 
       return (
         <div>
-          {e && <p>{'Error ' + e}</p>}
-          {w && (
+          {error && <p>{'Error ' + error}</p>}
+          {context && (
             <Tokens
-              wasmContext={w}
+              wasmContext={context}
               source={source}
               tokenLookup={token_strings}
             />
