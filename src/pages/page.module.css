@@ -56,11 +56,13 @@
 .token {
   border-radius: 3px;
   background-color: #def2e4;
+  line-height: 1.2;
 }
 
 .tokenbad {
   border-radius: 3px;
   background-color: #f4aeae;
+  line-height: 1.2;
 }
 .token:hover {
   border-radius: 3px;
