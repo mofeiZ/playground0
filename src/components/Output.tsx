@@ -13,11 +13,14 @@ type CompilerResult =
   | {
       kind: 'Context';
       value: WasmParserContext;
+      source: string;
     }
   | {
       kind: 'UnexpectedError';
       value: string;
     };
+
+const unicodeChar = /[^\u0000-\u00ff]/g;
 
 // wasm module must be loaded async, since it requires a web worker (?)
 const Output = dynamic(() => {
@@ -30,9 +33,15 @@ const Output = dynamic(() => {
     function useCompiler(source: string): CompilerResult {
       const result: CompilerResult = useMemo(() => {
         try {
+          // Rust/wasm and JS use differnt length unicode encodings for some characters.
+          // Since unicode will never be symbols / lexemes, we can always replace them
+          // with non-visible ascii.
+          const strippedSource = source.replaceAll(unicodeChar, '\u007f');
+          const context = parse_to_context(strippedSource);
           return {
             kind: 'Context',
-            value: parse_to_context(source),
+            value: context,
+            source: source,
           };
         } catch (e) {
           return {
@@ -71,18 +80,17 @@ const Output = dynamic(() => {
         // (next render after set)
       }, [compilerResult, wasmContext]);
 
-      let context =
-        compilerResult.kind === 'Context' ? compilerResult.value : null;
+      let result = compilerResult.kind === 'Context' ? compilerResult : null;
       let error =
         compilerResult.kind === 'UnexpectedError' ? compilerResult.value : null;
 
       return (
         <div>
           {error && <p>{'Error ' + error}</p>}
-          {context && (
+          {result && (
             <Tokens
-              wasmContext={context}
-              source={source}
+              wasmContext={result.value}
+              source={result.source}
               tokenLookup={token_strings}
             />
           )}
