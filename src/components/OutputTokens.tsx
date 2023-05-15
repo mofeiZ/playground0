@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import styles from '../pages/page.module.css';
 import type { WasmParserContext } from 'wasm-api';
 import invariant from 'invariant';

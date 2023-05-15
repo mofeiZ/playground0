@@ -1,11 +1,8 @@
 .main {
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between; */
-  /* align-items: center; */
   height: 100vh;
   width: 100vw;
-  /* min-height: 100vh; */
 }
 
 .description {
@@ -34,10 +31,6 @@
   flex-grow: 1;
   align-items: left;
   gap: 0.5rem;
-}
-
-.editorinput {
-  /* height: 500px */
 }
 
 .editorarea {
@@ -108,4 +101,43 @@
 .tooltip:hover .tooltiptext {
   visibility: visible;
   opacity: 0.9;
+}
+
+.outputTabSeparator {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+  align-self: center;
+  border-left-width: 1px;
+  background-color: #e5e7eb;
+  width: 1px;
+  height: 18px;
+}
+
+.outputTab {
+  display: flex;
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  align-items: center;
+  height: 100%;
+  border-bottom: 2px solid #b2d5e5;
+}
+
+.outputTabSelected {
+  border-bottom-color: #33a9e0;
+}
+
+.tabButton {
+  transition-duration: 50ms;
+  background-color: #ffffff;
+  border: none;
+}
+
+.parserNode_clickable:hover {
+  text-decoration: underline;
+}
+
+.parserNode_propTag::after {
+  content: ':  ';
 }

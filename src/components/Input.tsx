@@ -13,12 +13,5 @@ export function Input(props: {
       };
     }, [props.setInputText]);
 
-  return (
-    <textarea
-      rows={100}
-      cols={60}
-      className={styles.editorinput}
-      onChange={onChange}
-    ></textarea>
-  );
+  return <textarea rows={100} cols={60} onChange={onChange}></textarea>;
 }

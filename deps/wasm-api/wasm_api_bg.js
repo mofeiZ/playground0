@@ -114,6 +114,60 @@ export function parse_to_context(source) {
 
 /**
 */
+export class WasmParseTree {
+
+    static __wrap(ptr) {
+        const obj = Object.create(WasmParseTree.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    __destroy_into_raw() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmparsetree_free(ptr);
+    }
+    /**
+    * @returns {Uint32Array}
+    */
+    get_encoded_tree() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.wasmparsetree_get_encoded_tree(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            var v0 = getArrayU32FromWasm0(r0, r1).slice();
+            wasm.__wbindgen_free(r0, r1 * 4);
+            return v0;
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+        }
+    }
+    /**
+    * @returns {string}
+    */
+    get_strings() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.wasmparsetree_get_strings(retptr, this.ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(r0, r1);
+        }
+    }
+}
+/**
+*/
 export class WasmParserContext {
 
     static __wrap(ptr) {
@@ -141,6 +195,35 @@ export class WasmParserContext {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
             wasm.wasmparsercontext_token_strings(retptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            return getStringFromWasm0(r0, r1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(r0, r1);
+        }
+    }
+    /**
+    * @returns {boolean}
+    */
+    has_parse_tree() {
+        const ret = wasm.wasmparsercontext_has_parse_tree(this.ptr);
+        return ret !== 0;
+    }
+    /**
+    * @returns {WasmParseTree}
+    */
+    get_parse_tree() {
+        const ret = wasm.wasmparsercontext_get_parse_tree(this.ptr);
+        return WasmParseTree.__wrap(ret);
+    }
+    /**
+    * @returns {string}
+    */
+    static parse_tree_node_shapes() {
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.wasmparsercontext_parse_tree_node_shapes(retptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             return getStringFromWasm0(r0, r1);
