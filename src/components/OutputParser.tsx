@@ -3,6 +3,7 @@ import React from 'react';
 import { ReactElement, useMemo, useState } from 'react';
 import styles from '../pages/page.module.css';
 
+const SENTINEL_ID = 0;
 type ParserNodeProperty =
   | {
       kind: 'String';
@@ -19,6 +20,10 @@ type ParserNodeProperty =
   | {
       kind: 'MultiNode';
       value: Array<number>;
+    }
+  | {
+      kind: 'None';
+      value: null;
     };
 
 type ParseNode = {
@@ -28,7 +33,7 @@ type ParseNode = {
 
 export type ParseNodePropertyMetadata = {
   isNode: boolean;
-  isVariadic: boolean;
+  multiplicity: 'optional' | 'single' | 'variadic';
   name: string;
 };
 
@@ -53,7 +58,7 @@ function treeNode(tree: ParseTree, id: number): ParseNode {
 
   for (const property of nodePropertyMetadata) {
     let currProperty: ParserNodeProperty;
-    if (property.isVariadic) {
+    if (property.multiplicity === 'variadic') {
       const count = tree.data[curr++];
       const currPropertyValues: Uint32Array = tree.data.slice(
         curr,
@@ -79,16 +84,30 @@ function treeNode(tree: ParseTree, id: number): ParseNode {
       }
     } else {
       const currPropertyValue = tree.data[curr++];
-      if (property.isNode) {
+      if (
+        property.multiplicity === 'optional' &&
+        currPropertyValue === SENTINEL_ID
+      ) {
         currProperty = {
-          kind: 'Node',
-          value: currPropertyValue,
+          kind: 'None',
+          value: null,
         };
       } else {
-        currProperty = {
-          kind: 'String',
-          value: tree.internedStrings[currPropertyValue],
-        };
+        invariant(
+          currPropertyValue !== SENTINEL_ID,
+          '[Playground internal error]: Unexpected sentinel node.'
+        );
+        if (property.isNode) {
+          currProperty = {
+            kind: 'Node',
+            value: currPropertyValue,
+          };
+        } else {
+          currProperty = {
+            kind: 'String',
+            value: tree.internedStrings[currPropertyValue],
+          };
+        }
       }
     }
 
@@ -110,8 +129,6 @@ type CollapsiblePropertyArgs<CollapsibleArgs extends object> = {
   Collapsible: (props: CollapsibleArgs) => ReactElement;
   collapsibleArgs: CollapsibleArgs;
   label: string;
-
-  // expanded: boolean
 };
 
 function CollapsibleProperty<T extends object>(
@@ -200,6 +217,14 @@ function ParseNodeNode(props: ParseNodeNodeProps): ReactElement {
         case 'MultiString':
           propValue = <div>TODO multistring</div>;
           break;
+        case 'None':
+          propValue = (
+            <>
+              <span className={styles.parserNode_propTag}>{label}</span>
+              <span className="parserNode_propValueLiteral">[ none ]</span>
+            </>
+          );
+          break;
       }
       // We'll never reorder elements of this array (?)
       return <li key={idx}>{propValue}</li>;
@@ -207,7 +232,6 @@ function ParseNodeNode(props: ParseNodeNodeProps): ReactElement {
   );
 
   const PropertyList = function () {
-    console.log('componenent PropertyList called');
     return <ul>{propertyElements}</ul>;
   };
   return (

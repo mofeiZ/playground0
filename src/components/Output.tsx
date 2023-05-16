@@ -27,7 +27,7 @@ const unicodeChar = /[^\u0000-\u00ff]/g;
 
 type ParseTreeObjectProperty = {
   is_node: boolean;
-  is_variadic: boolean;
+  multiplicity: string;
   name: string;
 };
 
@@ -63,7 +63,7 @@ function getValidatedParseTreeMetadata(
       );
       invariant(
         typeof property.is_node === 'boolean' &&
-          typeof property.is_variadic === 'boolean' &&
+          typeof property.multiplicity === 'string' &&
           typeof property.name === 'string',
         '[Init] Bad property types when decoding ParseTree metadata'
       );
@@ -76,9 +76,15 @@ function getValidatedParseTreeMetadata(
       return [
         name,
         property.map((value) => {
+          invariant(
+            value.multiplicity === 'optional' ||
+              value.multiplicity === 'single' ||
+              value.multiplicity === 'variadic',
+            `[Init] Internal error when decoding multiplicity metadata (unexpected ${value.multiplicity})`
+          );
           return {
             isNode: value.is_node,
-            isVariadic: value.is_variadic,
+            multiplicity: value.multiplicity,
             name: value.name,
           };
         }),
@@ -173,8 +179,6 @@ const Output = dynamic(() => {
           const parseTree = value.get_parse_tree();
           const parseTreeData = parseTree.get_encoded_tree();
           const parseTreeStrings = parseTree.get_strings();
-          console.log(' >>> Parse tree data len!', parseTreeData.length);
-          console.log(' >>> Parse tree strings!', parseTreeStrings);
 
           tabsList.set(
             'parser',
