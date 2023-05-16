@@ -1,5 +1,5 @@
 import invariant from 'invariant';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { ReactElement, useMemo, useState } from 'react';
 import styles from '../pages/page.module.css';
 
@@ -125,22 +125,13 @@ function treeNode(tree: ParseTree, id: number): ParseNode {
   };
 }
 
-type CollapsiblePropertyArgs<CollapsibleArgs extends object> = {
-  Collapsible: (props: CollapsibleArgs) => ReactElement;
-  collapsibleArgs: CollapsibleArgs;
+function CollapsibleList(props: {
+  children: Array<ReactNode>;
   label: string;
-};
-
-function CollapsibleProperty<T extends object>(
-  props: CollapsiblePropertyArgs<T>
-): ReactElement {
+}): ReactElement {
   const [expanded, setExpanded] = useState(false);
-  const { Collapsible, collapsibleArgs, label } = props;
+  const { children, label } = props;
 
-  // Memoize child props to avoid unnecessary rerenders
-  const CollapsibleChild = useMemo(() => {
-    return React.createElement(Collapsible, collapsibleArgs);
-  }, [Collapsible, collapsibleArgs]);
   const ClickableChild = useMemo(() => {
     const toggleExpanded = () =>
       setExpanded((prevExpanded) => {
@@ -156,7 +147,7 @@ function CollapsibleProperty<T extends object>(
   return (
     <>
       {ClickableChild}
-      {expanded && CollapsibleChild}
+      {expanded && <ul>{children}</ul>}
     </>
   );
 }
@@ -205,13 +196,7 @@ function ParseNodeNode(props: ParseNodeNodeProps): ReactElement {
             }
           );
 
-          propValue = (
-            <CollapsibleProperty
-              Collapsible={() => <ul>{children}</ul>}
-              collapsibleArgs={{}}
-              label={label}
-            />
-          );
+          propValue = <CollapsibleList children={children} label={label} />;
           break;
         }
         case 'MultiString':
@@ -231,16 +216,7 @@ function ParseNodeNode(props: ParseNodeNodeProps): ReactElement {
     }
   );
 
-  const PropertyList = function () {
-    return <ul>{propertyElements}</ul>;
-  };
-  return (
-    <CollapsibleProperty
-      Collapsible={PropertyList}
-      collapsibleArgs={{}}
-      label={node.name}
-    />
-  );
+  return <CollapsibleList children={propertyElements} label={node.name} />;
 }
 
 export default function OutputParser(props: ParseTree) {
