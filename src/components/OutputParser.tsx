@@ -126,11 +126,11 @@ function treeNode(tree: ParseTree, id: number): ParseNode {
 }
 
 function CollapsibleList(props: {
-  children: Array<ReactNode>;
+  listChildren: Array<ReactNode>;
   label: string;
 }): ReactElement {
   const [expanded, setExpanded] = useState(false);
-  const { children, label } = props;
+  const { listChildren, label } = props;
 
   const ClickableChild = useMemo(() => {
     const toggleExpanded = () =>
@@ -147,7 +147,7 @@ function CollapsibleList(props: {
   return (
     <>
       {ClickableChild}
-      {expanded && <ul>{children}</ul>}
+      {expanded && <ul>{listChildren}</ul>}
     </>
   );
 }
@@ -196,7 +196,7 @@ function ParseNodeNode(props: ParseNodeNodeProps): ReactElement {
             }
           );
 
-          propValue = <CollapsibleList children={children} label={label} />;
+          propValue = <CollapsibleList listChildren={children} label={label} />;
           break;
         }
         case 'MultiString':
@@ -216,7 +216,7 @@ function ParseNodeNode(props: ParseNodeNodeProps): ReactElement {
     }
   );
 
-  return <CollapsibleList children={propertyElements} label={node.name} />;
+  return <CollapsibleList listChildren={propertyElements} label={node.name} />;
 }
 
 export default function OutputParser(props: ParseTree) {
