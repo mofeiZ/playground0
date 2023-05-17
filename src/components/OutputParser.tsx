@@ -93,11 +93,11 @@ function treeNode(tree: ParseTree, id: number): ParseNode {
           value: null,
         };
       } else {
-        invariant(
-          currPropertyValue !== SENTINEL_ID,
-          '[Playground internal error]: Unexpected sentinel node.'
-        );
         if (property.isNode) {
+          invariant(
+            currPropertyValue !== SENTINEL_ID,
+            '[Playground internal error]: Unexpected sentinel node.'
+          );
           currProperty = {
             kind: 'Node',
             value: currPropertyValue,
