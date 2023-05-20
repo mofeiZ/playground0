@@ -128,9 +128,10 @@ function treeNode(tree: ParseTree, id: number): ParseNode {
 function CollapsibleList(props: {
   listChildren: Array<ReactNode>;
   label: string;
+  hint: string | null;
 }): ReactElement {
   const [expanded, setExpanded] = useState(false);
-  const { listChildren, label } = props;
+  const { listChildren, label, hint } = props;
 
   const ClickableChild = useMemo(() => {
     const toggleExpanded = () =>
@@ -138,16 +139,28 @@ function CollapsibleList(props: {
         return !prevExpanded;
       });
     return (
-      <span className={styles.parserNode_clickable} onClick={toggleExpanded}>
-        {label}
-      </span>
+      <>
+        <span className={styles.parserNode_clickable} onClick={toggleExpanded}>
+          {label}
+        </span>
+        {hint && <span className={styles.parserNode_propTag} />}
+        {hint && (
+          <span
+            className={styles.parserNode_clickable}
+            style={{ color: 'gray' }}
+            onClick={toggleExpanded}
+          >
+            {hint}
+          </span>
+        )}
+      </>
     );
-  }, [label]);
+  }, [label, hint]);
 
   return (
     <>
       {ClickableChild}
-      {expanded && <ul>{listChildren}</ul>}
+      <ul style={expanded ? {} : { display: 'none' }}>{listChildren}</ul>
     </>
   );
 }
@@ -196,7 +209,15 @@ function ParseNodeNode(props: ParseNodeNodeProps): ReactElement {
             }
           );
 
-          propValue = <CollapsibleList listChildren={children} label={label} />;
+          propValue = (
+            <CollapsibleList
+              listChildren={children}
+              label={label}
+              hint={`[ ${children.length} ${
+                children.length === 1 ? 'element' : 'elements'
+              } ]`}
+            />
+          );
           break;
         }
         case 'MultiString':
@@ -216,7 +237,13 @@ function ParseNodeNode(props: ParseNodeNodeProps): ReactElement {
     }
   );
 
-  return <CollapsibleList listChildren={propertyElements} label={node.name} />;
+  return (
+    <CollapsibleList
+      listChildren={propertyElements}
+      label={node.name}
+      hint={null}
+    />
+  );
 }
 
 export default function OutputParser(props: ParseTree) {
